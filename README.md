@@ -1,5 +1,5 @@
 # Project 2: Item Catelog (Woodworking Project Forum)
-This web application demonstrates an item catelog functionality in the form of a woodworking project forum in which authorized users can add (post), edit, and delete their projects that they would like to share with the woodworking community. These woodworking projects are grouped into categories which can be added/edited/deleted by users with the appropriate access privileges (e.g., administrators/moderators). If a category contains projects posted by users, the application will not allow the category to be deleted.
+This web application demonstrates an item catalog functionality in the form of a woodworking project forum in which authorized users can add (post), edit, and delete their projects that they would like to share with the woodworking community. These woodworking projects are grouped into categories which can be added/edited/deleted by users with the appropriate access privileges (e.g., administrators/moderators). If a category contains projects posted by users, the application will not allow the category to be deleted.
 
 # Prerequisites for Running the Application
 
@@ -12,7 +12,7 @@ You will need to install the following libraries to run this web application:
  - SQLAlchemy (```$pip install sqlalchemy```)
 
 # Running the Woodworking Project Forum App
-Once you have logged your terminal into the virtual machine (```$vagrant ssh```), change to the /vagrant/catelog directory by typing (```$cd /vagrant/catelog```). Type (```$ls```) to ensure that you are inside the directory that contains project.py, database_setup.py, and two directories named 'templates' and 'static'
+Once you have logged your terminal into the virtual machine (```$vagrant ssh```), change to the /vagrant/catalog directory by typing (```$cd /vagrant/catalog```). Type (```$ls```) to ensure that you are inside the directory that contains project.py, database_setup.py, and two directories named 'templates' and 'static'
 
 ##### _Database Setup_
 Now type (```$python database_setup.py```) to initialize the database.
