@@ -1,0 +1,55 @@
+<html>
+  <!-- <head>
+    <link rel=stylesheet type=text/css href="{{ url_for('static',filename='styles.css')}}">
+  </head> -->
+  <body>
+    <h1>{{category.CategoryName}}</h1>
+
+    <a href = '{{url_for('newProject', category_id = category.CategoryID) }}'>
+      Create New Project</a>
+    </br>
+    <a href = '{{url_for('showCategories') }}'>
+      Back to Categories</a>
+    </br>
+    </br>
+
+    <!-- {% with messages = get_flashed_messages()%}
+      {% if messages%}
+
+        <ul>
+          {% for message in messages%}
+            <li> <strong> {{ message }} </strong> </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %} -->
+
+
+    {% for project in projects %}
+
+    <div>
+
+    <img src="{{project.ProjectName}}" alt="">
+    <strong>{{project.ProjectName}}</strong>
+    </br>
+    <em>{{project.ProjectDesc}}</em>
+    </br>
+    <strong>Date Added: </strong>{{project.DateAdd}}
+    </br>
+    <strong>Date Edited: </strong>{{project.DateEdit}}
+    </br>
+    {{project.UserID}}
+  </br><a href = '{{url_for('editProject', category_id = category.CategoryID, project_id = project.ProjectID)}}'>
+      Edit</a>
+    </br>
+    <a href = '{{url_for('deleteProject', category_id = category.CategoryID, project_id = project.ProjectID)}}'>
+      Delete</a>
+    </br>
+    </br>
+    </div>
+
+
+    {% endfor %}
+  </body>
+
+</html>
