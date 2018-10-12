@@ -22,8 +22,7 @@ class User(Base):
     UserID = Column(Integer, primary_key=True)
     Username = Column(String(50), nullable=False)
     UserEmail = Column(String(100))
-    PictureID = Column(Integer, ForeignKey('UploadFile.FileID'))
-    Picture = relationship(UploadFile)
+    UserPicture = Column(String(250))
 
     @property
     def serialize(self):
@@ -32,7 +31,6 @@ class User(Base):
             'UserID': self.UserID,
             'Username': self.Username,
             'UserEmail': self.UserEmail,
-            'PictureID': self.PictureID,
         }
 
 
@@ -42,8 +40,7 @@ class Category(Base):
     CategoryID = Column(Integer, primary_key=True)
     CategoryName = Column(String(75), nullable=False)
     CategoryDesc = Column(String(250))
-    PictureID = Column(Integer, ForeignKey('UploadFile.FileID'))
-    Picture = relationship(UploadFile)
+    CategoryPicture = Column(String(250))
 
     @property
     def serialize(self):
@@ -52,7 +49,6 @@ class Category(Base):
             'CategoryID': self.CategoryID,
             'CategoryName': self.CategoryName,
             'CategoryDesc': self.CategoryDesc,
-            'PictureID': self.PictureID,
         }
 
 
@@ -62,7 +58,7 @@ class Project(Base):
     ProjectID = Column(Integer, primary_key=True)
     ProjectName = Column(String(100), nullable=False)
     ProjectDesc = Column(String(500))
-    PictureID = Column(Integer, ForeignKey('UploadFile.FileID'))
+    ProjectPicture = Column(String(250))
     DateAdd = Column(DateTime)
     DateEdit = Column(DateTime)
     CategoryID = Column(Integer, ForeignKey('Category.CategoryID'))
@@ -77,7 +73,6 @@ class Project(Base):
             'ProjectID': self.ProjectID,
             'ProjectName': self.ProjectName,
             'ProjectDesc': self.ProjectDesc,
-            'PictureID': self.PictureID,
             'DateAdd': self.DateAdd,
             'DateEdit': self.DateEdit,
             'CategoryID': self.CategoryID,

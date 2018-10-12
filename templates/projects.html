@@ -29,7 +29,8 @@
 
     <div>
 
-    <img src="{{project.ProjectName}}" alt="">
+    <img src='{{url_for('static', filename = project.ProjectPicture)}}' height="200px" width = "200px">
+    </br>
     <strong>{{project.ProjectName}}</strong>
     </br>
     <em>{{project.ProjectDesc}}</em>

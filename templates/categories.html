@@ -25,11 +25,11 @@
     {% for category in categories %}
 
     <div>
-    <img src="{{categories.data}}" alt="">
     </br>
-    {{category.CategoryName}}
+    <strong>{{category.CategoryName}}</strong>
     </br>
-    <a href = '{{url_for('showProjects', category_id = category.CategoryID)}}'>
+    <img src='{{url_for('static', filename = category.CategoryPicture)}}' height="200px" width = "200px">
+    </br><a href = '{{url_for('showProjects', category_id = category.CategoryID)}}'>
       Projects</a>
     </br>
     <a href = '{{url_for('editCategory', category_id = category.CategoryID)}}'>
