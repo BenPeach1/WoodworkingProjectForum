@@ -5,20 +5,21 @@
   <body>
     <h1> Edit Project </h1>
 
-    <form action="{{url_for('editProject', category_id=category_id, project_id=project_id )}}" method = 'POST'>
+    <form action="{{url_for('editProject', category_id=category_id, project_id=project_id )}}" method = 'POST' enctype="multipart/form-data">
 
       <p>Project Name:</p>
 
-      <input type='text' size='30' name='name' placeholder="{{project.ProjectName}}">
+      <input type='text' size='30' name='name' value="{{project.ProjectName}}">
 
       <p>Description:</p>
 
-      <input type='text' size='100' name='description' placeholder="{{project.ProjectDesc}}">
+      <input type='text' size='100' name='description' value="{{project.ProjectDesc}}">
 
       <p>Picture:</p>
 
-      <input type='text' size='30' name='picture'>
-
+      <input type='file' name='picture' accept="image/*" multiple>
+      </br>
+      </br>
       <input type='submit' value='Edit'>
 
       <a href = '{{url_for('showProjects', category_id = category_id)}}'>Cancel</a>
