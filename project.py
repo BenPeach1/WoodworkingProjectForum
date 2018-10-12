@@ -220,6 +220,36 @@ def deleteProject(category_id, project_id):
         return render_template('deleteproject.html', category_id=category_id, project_id=project_id, project=deletedProject)
 
 
+# JSON API Endpoints:
+# JSON APIs to view Restaurant Information
+@app.route('/category/<int:category_id>/projects/JSON')
+def categoryProjectsJSON(category_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    category = session.query(Category).filter_by(
+        CategoryID=category_id).one()
+    projects = session.query(Project).filter_by(
+        CategoryID=category.CategoryID)
+    return jsonify(Projects=[p.serialize for p in projects])
+
+
+@app.route('/category/<int:category_id>/projects/<int:project_id>/JSON')
+def projectJSON(category_id, project_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    project = session.query(Project).filter_by(
+        ProjectID=project_id).one()
+    return jsonify(Project=project.serialize)
+
+
+@app.route('/category/JSON')
+def categoriesJSON():
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    categories = session.query(Category).all()
+    return jsonify(categories=[c.serialize for c in categories])
+
+
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
