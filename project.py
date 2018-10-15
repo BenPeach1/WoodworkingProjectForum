@@ -146,9 +146,12 @@ def showProjects(category_id):
 def showOneProject(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    projects = session.query(Project).filter_by(
+    category = session.query(Category).filter_by(
+        CategoryID=category_id).one()
+    project = session.query(Project).filter_by(
         ProjectID=project_id).one()
-    return render_template('oneproject.html', projects=projects)
+    photos = session.query(Project).limit(10)
+    return render_template('oneproject.html', category=category, project=project, photos=photos)
 
 
 # ADD PROJECT:
@@ -211,7 +214,7 @@ def editProject(category_id, project_id):
         session.add(editedProject)
         session.commit()
         # flash("Project Successfully Edited!")
-        return redirect(url_for('showProjects', category_id=category_id))
+        return redirect(url_for('showOneProject', category_id=category_id, project_id=project_id))
     else:
         return render_template('editproject.html', category_id=category_id, project_id=project_id, project=editedProject)
 

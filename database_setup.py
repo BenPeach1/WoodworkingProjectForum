@@ -13,7 +13,7 @@ class UploadFile(Base):
 
     FileID = Column(Integer, primary_key=True)
     FileName = Column(String(300))
-    Data = Column(LargeBinary)
+    # ProjectID = Column(Integer, ForeignKey('Project.ProjectID')))
 
 
 class User(Base):

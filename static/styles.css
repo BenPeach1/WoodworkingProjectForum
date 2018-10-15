@@ -120,7 +120,11 @@ h3 {
 .banner h1 {
 	margin: 45px 0;
 }
- .category-list {
+.project-panel {
+ background-color: #F0F0F0;
+	padding: 20px;
+}
+.category-list {
   background-color: #F0F0F0;
  	padding: 20px;
 u }
