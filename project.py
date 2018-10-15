@@ -46,7 +46,9 @@ def showCategories():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     categories = session.query(Category).all()
-    return render_template('categories.html', categories=categories)
+    recentProjects = session.query(Project).outerjoin(
+        Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(5)
+    return render_template('categories.html', categories=categories, recentProjects=recentProjects)
 
 
 # ADD CATEGORY:
@@ -137,6 +139,16 @@ def showProjects(category_id):
     projects = session.query(Project).filter_by(
         CategoryID=category.CategoryID)
     return render_template('projects.html', category=category, projects=projects)
+
+
+# SHOW ONE PROJECT:
+@app.route('/category/<int:category_id>/projects/<int:project_id>')
+def showOneProject(category_id, project_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    projects = session.query(Project).filter_by(
+        ProjectID=project_id).one()
+    return render_template('oneproject.html', projects=projects)
 
 
 # ADD PROJECT:
