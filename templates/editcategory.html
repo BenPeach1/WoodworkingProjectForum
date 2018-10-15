@@ -1,27 +1,32 @@
-<html>
-  <!-- <head>
-    <link rel=stylesheet type=text/css href="{{ url_for('static',filename='styles.css')}}">
-  </head> -->
-  <body>
-    <h1> Edit Category </h1>
-
-    <form action="{{url_for('editCategory', category_id=category_id )}}" method = 'POST' enctype="multipart/form-data">
-
-      <p>Category Name:</p>
-
-      <input type='text' size='30' name='name' value="{{category.CategoryName}}">
-
-      <p>Category Image:</p>
-
-      <input type='file' name='picture' accept="image/*" multiple>
-      </br>
-      </br>
-      <input type='submit' value='Edit'>
-
-      <a href = '{{url_for('showCategories')}}'>Cancel</a>
-
-    </form>
-
-
-  </body>
-</html>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>Edit {{category.CategoryName}}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+			<form action="{{ url_for('editCategory',category_id = category.CategoryID)}}" method = "POST" enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="name">Category Name:</label>
+					<input type ="text" class="form-control" name="name" value="{{category.CategoryName}}">
+					<div class="padding-bottom"></div>
+          <label for="name">Category Picture:</label>
+          <input type="file" name="picture" accept="image/*">
+          <div class="padding-bottom"></div>
+					<button type="submit" class="btn btn-default" id="submit" type="submit">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save</button>
+					<a href = '{{url_for('showCategories')}}'>
+						<button class="btn btn-default delete">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+					</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

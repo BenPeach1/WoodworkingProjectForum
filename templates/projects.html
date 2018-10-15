@@ -58,7 +58,7 @@
 						<strong>User:</strong> {{project.User.Username}}</br>
 						<strong>Added:</strong> {{project.DateAdd}}</br>
 						<a href='{{url_for('editProject', category_id = category.CategoryID, project_id=project.ProjectID ) }}'>Edit</a> |
-						<a href='{{url_for('editProject', category_id = category.CategoryID, project_id=project.ProjectID ) }}'>Delete</a>
+						<a href='{{url_for('deleteProject', category_id = category.CategoryID, project_id=project.ProjectID ) }}'>Delete</a>
 					</div>
 	      {% endfor %}
 	    </div>

@@ -81,7 +81,7 @@ def newCategory():
         return render_template('newcategory.html')
 
 
-# # EDIT CATEGORY:
+# EDIT CATEGORY:
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
     DBSession = sessionmaker(bind=engine)
@@ -91,8 +91,8 @@ def editCategory(category_id):
     if request.method == 'POST':
         if request.form['name']:
             target = os.path.join(APP_ROOT, 'static/')
-            if not os.path.isdir(target):
-                os.mkdir(target)
+            # if not os.path.isdir(target):
+            #     os.mkdir(target)
             if request.files.get("picture") != None:
                 file = request.files.get("picture")
                 filename = file.filename
