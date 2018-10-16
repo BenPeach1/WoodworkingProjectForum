@@ -184,12 +184,12 @@ def newProject(category_id):
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
                 CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
-                ProjectPicture=filename)
+                ProjectLocation=request.form['location'], ProjectPicture=filename)
         else:
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
                 CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
-                ProjectPicture='default.jpg')
+                ProjectLocation=request.form['location'], ProjectPicture='default.jpg')
         session.add(newProject)
         session.commit()
 
@@ -223,6 +223,7 @@ def editProject(category_id, project_id):
         if request.form['name']:
             editedProject.ProjectName = request.form['name']
             editedProject.ProjectDesc = request.form['description']
+            editedProject.ProjectLocation = request.form['location']
             editedProject.DateEdit = datetime.now()
             target = os.path.join(APP_ROOT, 'static/images/')
             if not os.path.isdir(target):

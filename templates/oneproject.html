@@ -55,17 +55,20 @@
           <div class="col-lg-1 col-md-1 col-sm-1"></div>
           <div class="col-lg-5 col-md-5 col-sm-5">
             <h2>{{project.ProjectName}}</h2>
-            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><strong>Virginia Beach, VA</strong>
+						<strong>Contributor: </strong><i>{{project.User.Username}}</i></br>
+						{% if project.ProjectLocation != None %}
+							<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><i>{{project.ProjectLocation}}</i>
+						{% endif %}
 						</br>
-						<strong>Contributor: </strong><i>{{project.User.Username}}</i>
-            <p>{{project.ProjectDesc}}</p>
+						</br>
+						<p><strong>Project Description: </strong>{{project.ProjectDesc}}</p>
             <div class="row">
 							<div class="thumbnails group">
 	      	      {% for photo in photos %}
 	      	        <!-- <div class="col-lg-2 col-md-2 col-sm-2 thumbnails group"> -->
 
 	                  <a href="{{url_for('static', filename = 'images/' + photo.FileName)}}" data-lightbox="gallery" data-title="{{project.ProjectName}}">
-	                    <img src='{{url_for('static', filename = 'images/' + photo.FileName)}}' width = "50px" height = "50px">
+	                    <img src='{{url_for('static', filename = 'images/' + photo.FileName)}}' width = "75px" height = "75px">
 	                  </a>
 	      	      {% endfor %}
 							</div>
