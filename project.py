@@ -37,8 +37,9 @@ Base.metadata.bind = engine
 # # DISCONNECT - Revoke a current user's token and reset their login_session
 # @app.route("/gdisconnect")
 
-
+# ******************************************************************************
 # SHOW CATEGORIES:
+# ******************************************************************************
 @app.route('/')
 @app.route('/category')
 def showCategories():
@@ -51,13 +52,15 @@ def showCategories():
     return render_template('categories.html', categories=categories, recentProjects=recentProjects)
 
 
+# ******************************************************************************
 # ADD CATEGORY:
+# ******************************************************************************
 @app.route('/category/new', methods=['GET', 'POST'])
 def newCategory():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     if request.method == 'POST':
-        target = os.path.join(APP_ROOT, 'static/')
+        target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
         if request.files.get("picture") != None:
@@ -81,7 +84,9 @@ def newCategory():
         return render_template('newcategory.html')
 
 
+# ******************************************************************************
 # EDIT CATEGORY:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
     DBSession = sessionmaker(bind=engine)
@@ -90,7 +95,8 @@ def editCategory(category_id):
         Category).filter_by(CategoryID=category_id).one()
     if request.method == 'POST':
         if request.form['name']:
-            target = os.path.join(APP_ROOT, 'static/')
+            editedCategory.CategoryName = request.form['name']
+            target = os.path.join(APP_ROOT, 'static/images/')
             # if not os.path.isdir(target):
             #     os.mkdir(target)
             if request.files.get("picture") != None:
@@ -98,12 +104,10 @@ def editCategory(category_id):
                 filename = file.filename
                 destination = "/".join([target, filename])
                 file.save(destination)
-
-                editedCategory.CategoryName = request.form['name']
                 editedCategory.CategoryPicture = filename
             else:
-                editedCategory.CategoryName = request.form['name']
-                editedCategory.CategoryPicture = "default.jpg"
+                if editedCategory.CategoryPicture == None:
+                    editedCategory.CategoryPicture = 'default.jpg'
         session.add(editedCategory)
         session.commit()
         # flash("Category Successfully Edited!")
@@ -112,7 +116,9 @@ def editCategory(category_id):
         return render_template('editcategory.html', category_id=category_id, category=editedCategory)
 
 
+# ******************************************************************************
 # DELETE CATEGORY:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     DBSession = sessionmaker(bind=engine)
@@ -128,7 +134,9 @@ def deleteCategory(category_id):
         return render_template('deletecategory.html', category=deletedCategory)
 
 
+# ******************************************************************************
 # SHOW PROJECTS:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/')
 @app.route('/category/<int:category_id>/projects')
 def showProjects(category_id):
@@ -141,7 +149,9 @@ def showProjects(category_id):
     return render_template('projects.html', category=category, projects=projects)
 
 
+# ******************************************************************************
 # SHOW ONE PROJECT:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/<int:project_id>')
 def showOneProject(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
@@ -150,17 +160,20 @@ def showOneProject(category_id, project_id):
         CategoryID=category_id).one()
     project = session.query(Project).filter_by(
         ProjectID=project_id).one()
-    photos = session.query(Project).limit(10)
+    photos = session.query(UploadFile).filter_by(
+        ProjectID=project_id).all()
     return render_template('oneproject.html', category=category, project=project, photos=photos)
 
 
+# ******************************************************************************
 # ADD PROJECT:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/new', methods=['GET', 'POST'])
 def newProject(category_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     if request.method == 'POST':
-        target = os.path.join(APP_ROOT, 'static/')
+        target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
         if request.files.get("picture") != None:
@@ -179,22 +192,39 @@ def newProject(category_id):
                 ProjectPicture='default.jpg')
         session.add(newProject)
         session.commit()
-        # flash("New Project Created!")
+
+        if request.files.get("additional-pictures") != None:
+            for file2 in request.files.getlist("additional-pictures"):
+                filename2 = file2.filename
+                destination = "/".join([target, filename2])
+                file2.save(destination)
+                newPicture = UploadFile(
+                    FileName=filename2, ProjectID=newProject.ProjectID)
+                session.add(newPicture)
+                session.commit()
+        flash("New Project Created!")
         return redirect(url_for('showProjects', category_id=category_id))
     else:
         return render_template('newproject.html', category_id=category_id)
 
 
-# # EDIT PROJECT:
+# ******************************************************************************
+# EDIT PROJECT
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/<project_id>/edit', methods=['GET', 'POST'])
 def editProject(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     editedProject = session.query(Project).filter_by(
         ProjectID=project_id).one()
+    editedPhotos = session.query(UploadFile).filter_by(
+        ProjectID=project_id).all()
     if request.method == 'POST':
         if request.form['name']:
-            target = os.path.join(APP_ROOT, 'static/')
+            editedProject.ProjectName = request.form['name']
+            editedProject.ProjectDesc = request.form['description']
+            editedProject.DateEdit = datetime.now()
+            target = os.path.join(APP_ROOT, 'static/images/')
             if not os.path.isdir(target):
                 os.mkdir(target)
             if request.files.get("picture") != None:
@@ -202,15 +232,32 @@ def editProject(category_id, project_id):
                 filename = file.filename
                 destination = "/".join([target, filename])
                 file.save(destination)
-                editedProject.ProjectName = request.form['name']
-                editedProject.ProjectDesc = request.form['description']
-                editedProject.DateEdit = datetime.now()
                 editedProject.ProjectPicture = filename
             else:
-                editedProject.ProjectName = request.form['name']
-                editedProject.ProjectDesc = request.form['description']
-                editedProject.DateEdit = datetime.now()
-                editedProject.ProjectPicture = 'default.jpg'
+                if editedProject.ProjectPicture == None:
+                    editedProject.ProjectPicture = 'default.jpg'
+
+            if request.files.get("additional-pictures") != None:
+                # additionalPictures = session.query(
+                #     UploadFile).filter_by(ProjectID=project_id).all()
+                # for picture in additionalPictures:
+                #     deletedPicture = session.query(
+                #         UploadFile).filter_by(FileID=picture.FileID).one()
+                #     session.delete(deletedPicture)
+                #     session.commit()
+
+                for file2 in request.files.getlist("additional-pictures"):
+                    filename2 = file2.filename
+                    additionalPicture = session.query(UploadFile).filter_by(
+                        ProjectID=project_id).filter_by(FileName=filename2).first()
+                    if additionalPicture == None:
+                        destination = "/".join([target,
+                                                filename2])
+                        file2.save(destination)
+                        newPicture = UploadFile(
+                            FileName=filename2, ProjectID=project_id)
+                        session.add(newPicture)
+                        session.commit()
         session.add(editedProject)
         session.commit()
         # flash("Project Successfully Edited!")
@@ -219,7 +266,9 @@ def editProject(category_id, project_id):
         return render_template('editproject.html', category_id=category_id, project_id=project_id, project=editedProject)
 
 
-# # DELETE PROJECT:
+# ******************************************************************************
+# DELETE PROJECT:
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/<project_id>/delete', methods=['GET', 'POST'])
 def deleteProject(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
@@ -227,16 +276,30 @@ def deleteProject(category_id, project_id):
     deletedProject = session.query(
         Project).filter_by(ProjectID=project_id).one()
     if request.method == 'POST':
+        projectPictures = session.query(
+            UploadFile).filter_by(ProjectID=project_id).all()
+        if projectPictures != None:
+            for picture in projectPictures:
+                deletedPicture = session.query(
+                    UploadFile).filter_by(FileID=picture.FileID).one()
+                session.delete(deletedPicture)
+                session.commit()
+
         session.delete(deletedProject)
         session.commit()
-        # flash("Project Successfully Deleted!")
+
+        flash("Project Successfully Deleted!")
         return redirect(url_for('showProjects', category_id=category_id))
     else:
         return render_template('deleteproject.html', category_id=category_id, project_id=project_id, project=deletedProject)
 
 
+# ******************************************************************************
 # JSON API Endpoints:
-# JSON APIs to view Restaurant Information
+# ******************************************************************************
+
+# JSON Endpoint to view Category data
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/JSON')
 def categoryProjectsJSON(category_id):
     DBSession = sessionmaker(bind=engine)
@@ -248,6 +311,8 @@ def categoryProjectsJSON(category_id):
     return jsonify(Projects=[p.serialize for p in projects])
 
 
+# JSON Endpoint to view Individual Project data
+# ******************************************************************************
 @app.route('/category/<int:category_id>/projects/<int:project_id>/JSON')
 def projectJSON(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
@@ -257,6 +322,8 @@ def projectJSON(category_id, project_id):
     return jsonify(Project=project.serialize)
 
 
+# JSON Endpoint to view Category/Project data
+# ******************************************************************************
 @app.route('/category/JSON')
 def categoriesJSON():
     DBSession = sessionmaker(bind=engine)

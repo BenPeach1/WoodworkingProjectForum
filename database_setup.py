@@ -8,14 +8,6 @@ from datetime import datetime
 Base = declarative_base()
 
 
-class UploadFile(Base):
-    __tablename__ = 'UploadFile'
-
-    FileID = Column(Integer, primary_key=True)
-    FileName = Column(String(300))
-    # ProjectID = Column(Integer, ForeignKey('Project.ProjectID')))
-
-
 class User(Base):
     __tablename__ = 'User'
 
@@ -59,6 +51,7 @@ class Project(Base):
     ProjectName = Column(String(100), nullable=False)
     ProjectDesc = Column(String(500))
     ProjectPicture = Column(String(250))
+    ProjectLocation = Column(String(100))
     DateAdd = Column(DateTime)
     DateEdit = Column(DateTime)
     CategoryID = Column(Integer, ForeignKey('Category.CategoryID'))
@@ -78,6 +71,14 @@ class Project(Base):
             'CategoryID': self.CategoryID,
             'UserID': self.UserID,
         }
+
+
+class UploadFile(Base):
+    __tablename__ = 'UploadFile'
+
+    FileID = Column(Integer, primary_key=True)
+    FileName = Column(String(300))
+    ProjectID = Column(Integer, ForeignKey('Project.ProjectID'))
 
 
 engine = create_engine('sqlite:///woodworking_projects.db')

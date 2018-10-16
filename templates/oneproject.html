@@ -50,21 +50,25 @@
 	    <div class="row">
         <div class="col-lg-11 col-md-11 col-sm-11 project-panel">
           <div class="col-lg-5 col-md-5 col-sm-5">
-            <img src='{{url_for('static', filename = project.ProjectPicture)}}' width = "500px" height = "500px">
+            <img src='{{url_for('static', filename = 'images/' + project.ProjectPicture)}}' width = "500px" height = "500px">
           </div>
           <div class="col-lg-1 col-md-1 col-sm-1"></div>
           <div class="col-lg-5 col-md-5 col-sm-5">
             <h2>{{project.ProjectName}}</h2>
-            <strong>Contributor: </strong><i>{{project.User.Username}}</i>
+            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><strong>Virginia Beach, VA</strong>
+						</br>
+						<strong>Contributor: </strong><i>{{project.User.Username}}</i>
             <p>{{project.ProjectDesc}}</p>
             <div class="row">
-      	      <!-- {% for photo in photos %}
-      	        <div class="col-lg-2 col-md-2 col-sm-2">
-                  <a href="{{url_for('static', filename = photo.ProjectPicture)}}">
-                    <img src='{{url_for('static', filename = photo.ProjectPicture)}}' width = "100px" height = "100px">
-                  </a>
-                </div>
-      	      {% endfor %} -->
+							<div class="thumbnails group">
+	      	      {% for photo in photos %}
+	      	        <!-- <div class="col-lg-2 col-md-2 col-sm-2 thumbnails group"> -->
+
+	                  <a href="{{url_for('static', filename = 'images/' + photo.FileName)}}" data-lightbox="gallery" data-title="{{project.ProjectName}}">
+	                    <img src='{{url_for('static', filename = 'images/' + photo.FileName)}}' width = "50px" height = "50px">
+	                  </a>
+	      	      {% endfor %}
+							</div>
       	    </div>
         </div>
         </div>
