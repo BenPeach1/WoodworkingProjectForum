@@ -12,7 +12,7 @@
   <div class="row banner main">
     <div class="col-md-1"></div>
     <div class="col-md-10 padding-none">
-      <h1>The Dusty Life Forum</h1>
+      <h1>The Woodworker's Forum</h1>
     </div>
   </div>
 
@@ -52,7 +52,7 @@
 
               <div class="col-lg-4 col-md-6 col-sm-12 category-list">
                 <img src='{{url_for('static', filename = 'images/' + category.CategoryPicture)}}' class="img-fluid">
-              </br>
+                </br>
                 <h3>{{category.CategoryName}}</h3>
               </div>
         </a>
@@ -64,14 +64,17 @@
     <h2>Recent Projects</h2>
     <div class="row">
       {% for project in recentProjects %}
-          <div class="col-lg-4 col-md-6 col-sm-12 category-list">
-            <img src='{{url_for('static', filename = 'images/' + project.ProjectPicture)}}' height="150px" width = "150px">
-            </br>
-            <h3>{{project.ProjectName}}</h3>
-            <h3><strong>Category:</strong> {{project.Category.CategoryName}}</h3>
-            <h3><strong>User:</strong>{{project.User.Username}}</h3>
-            <h3>{{project.DateAdd}}</h3>
-          </div>
+          <a href = "{{url_for('showOneProject', category_id = project.CategoryID, project_id=project.ProjectID)}}">
+          <!-- <div class="col-lg-4 col-md-6 col-sm-12 category-list"> -->
+            <div class="col-lg-4 col-md-6 col-sm-12 category-list">
+              <img src='{{url_for('static', filename = 'images/' + project.ProjectPicture)}}' height="150px" width = "150px">
+              </br>
+              <h3>{{project.ProjectName}}</h3>
+              <h3><strong>Category:</strong> {{project.Category.CategoryName}}</h3>
+              <h3><strong>User:</strong>{{project.User.Username}}</h3>
+              <h3>{{project.DateAdd}}</h3>
+            </div>
+          <a/>
       {% endfor %}
     </div>
   </div>

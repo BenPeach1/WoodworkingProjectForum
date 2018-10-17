@@ -57,7 +57,9 @@
             <h2>{{project.ProjectName}}</h2>
 						<strong>Contributor: </strong><i>{{project.User.Username}}</i></br>
 						{% if project.ProjectLocation != None %}
-							<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><i>{{project.ProjectLocation}}</i>
+							{% if project.ProjectLocation != '' %}
+								<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><i>{{project.ProjectLocation}}</i>
+							{% endif %}
 						{% endif %}
 						</br>
 						</br>

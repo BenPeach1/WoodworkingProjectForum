@@ -8,7 +8,7 @@ img {
 }
 
 h1 {
-	font-family: "Helvetica Neue Light", Roboto, Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue Bold", Anton, Helvetica, Arial, sans-serif;
 	font-size: 60px;
 	color: #000000;
 	line-height: 60px;
@@ -49,7 +49,7 @@ h3 {
  /*Thumbnail Styles*/
  .thumbnails a {
 	 float:left;
-	 width: 50%;
+	 width: 25%;
  }
 .padding-top {
 	padding-top: 30px;
@@ -110,7 +110,8 @@ h3 {
 }
 .banner.main {
 	height: 150px;
-	background: url("/static/images/top-banner.jpg");
+	background: url("/static/images/top-banner3.jpg");
+	back
 	background-position: right;
 	background-repeat: no-repeat;
 	background-size: cover;
