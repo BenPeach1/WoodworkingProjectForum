@@ -117,8 +117,13 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
     output = ''
-    output += '<h1>Welcome, '
+    output += '<h1>Welcome '
     output += login_session['username']
     output += '!</h1>'
     output += '<img src="'
@@ -127,6 +132,39 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
+
+
+def createUser(login_session):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    newUser = User(Username=login_session['username'],
+                   UserEmail=login_session['email'], UserPicture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(
+        UserEmail=login_session['email']).first()
+    return user.UserID
+
+
+def getUserID(checkEmail):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    try:
+        checkUser = session.query(User).filter_by(
+            UserEmail=checkEmail).one()
+        return checkUser.UserID
+    except:
+        return None
+
+
+def getUserInfo(user_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    try:
+        userInfo = session.query(User).filter_by(UserID=user_id).one()
+        return userInfo
+    except:
+        return None
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
@@ -140,7 +178,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     # Execute HTTP GET request to revoke current token:
-    #access_token = credentials.access_token
+    # access_token = credentials.access_token
     print('In gdisconnect access token is %s' % access_token)
     print('Username is: ')
     print(login_session['username'])
@@ -182,7 +220,10 @@ def showCategories():
     categories = session.query(Category).all()
     recentProjects = session.query(Project).outerjoin(
         Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(5)
-    return render_template('categories.html', categories=categories, recentProjects=recentProjects)
+    if 'username' not in login_session:
+        return render_template('publiccategories.html', categories=categories, recentProjects=recentProjects)
+    else:
+        return render_template('categories.html', categories=categories, recentProjects=recentProjects)
 
 
 # ******************************************************************************
@@ -206,7 +247,8 @@ def newCategory():
 
             newCategory = Category(
                 CategoryName=request.form['name'],
-                CategoryPicture=filename)
+                CategoryPicture=filename,
+                UserID=login_session['user_id'])
         else:
             newCategory = Category(
                 CategoryName=request.form['name'],
@@ -230,6 +272,13 @@ def editCategory(category_id):
     session = DBSession()
     editedCategory = session.query(
         Category).filter_by(CategoryID=category_id).one()
+    if editedCategory.UserID != login_session['user_id']:
+        output = ""
+        output += "<script>function myFunction() {alert('You are not authorized to "
+        output += "edit this category. Please access one of the categories you "
+        output += "created or create a new category in order to edit.');}"
+        output += "</script><body onload='myFunction()''>"
+        return output
     if request.method == 'POST':
         if request.form['name']:
             editedCategory.CategoryName = request.form['name']
@@ -264,6 +313,13 @@ def deleteCategory(category_id):
     session = DBSession()
     deletedCategory = session.query(
         Category).filter_by(CategoryID=category_id).one()
+    if deletedCategory.UserID != login_session['user_id']:
+        output = ""
+        output += "<script>function myFunction() {alert('You are not authorized to "
+        output += "delete this category. Please access one of the categories you "
+        output += "created or create a new category in order to delete.');}"
+        output += "</script><body onload='myFunction()''>"
+        return output
     if request.method == 'POST':
         session.delete(deletedCategory)
         session.commit()
@@ -283,9 +339,16 @@ def showProjects(category_id):
     session = DBSession()
     category = session.query(
         Category).filter_by(CategoryID=category_id).one()
+    contributor = getUserInfo(category.UserID)
     projects = session.query(Project).filter_by(
         CategoryID=category.CategoryID)
-    return render_template('projects.html', category=category, projects=projects)
+    if 'username' not in login_session:
+        return render_template('publicprojects.html', category=category, projects=projects)
+    else:
+        if contributor.UserID != login_session['user_id']:
+            return render_template('publicprojects.html', category=category, projects=projects)
+        else:
+            return render_template('projects.html', category=category, projects=projects, contributor=contributor)
 
 
 # ******************************************************************************
@@ -301,7 +364,14 @@ def showOneProject(category_id, project_id):
         ProjectID=project_id).one()
     photos = session.query(UploadFile).filter_by(
         ProjectID=project_id).all()
-    return render_template('oneproject.html', category=category, project=project, photos=photos)
+    contributor = getUserInfo(project.UserID)
+    if 'username' not in login_session:
+        return render_template('publiconeproject.html', category=category, project=project, photos=photos, contributor=contributor)
+    else:
+        if login_session['user_id'] == project.UserID:
+            return render_template('oneproject.html', category=category, project=project, photos=photos, contributor=contributor)
+        else:
+            return render_template('publiconeproject.html', category=category, project=project, photos=photos, contributor=contributor)
 
 
 # ******************************************************************************
@@ -325,12 +395,14 @@ def newProject(category_id):
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
                 CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
-                ProjectLocation=request.form['location'], ProjectPicture=filename)
+                ProjectLocation=request.form['location'], ProjectPicture=filename,
+                UserID=login_session['user_id'])
         else:
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
                 CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
-                ProjectLocation=request.form['location'], ProjectPicture='default.jpg')
+                ProjectLocation=request.form['location'], ProjectPicture='default.jpg',
+                UserID=login_session['user_id'])
         session.add(newProject)
         session.commit()
 
@@ -362,6 +434,13 @@ def editProject(category_id, project_id):
         ProjectID=project_id).one()
     editedPhotos = session.query(UploadFile).filter_by(
         ProjectID=project_id).all()
+    if editedProject.UserID != login_session['user_id']:
+        output = ""
+        output += "<script>function myFunction() {alert('You are not authorized to "
+        output += "edit this Project. Please access one of the projects you "
+        output += "created or create a new project in order to edit.');}"
+        output += "</script><body onload='myFunction()''>"
+        return output
     if request.method == 'POST':
         if request.form['name']:
             editedProject.ProjectName = request.form['name']
@@ -421,6 +500,13 @@ def deleteProject(category_id, project_id):
     session = DBSession()
     deletedProject = session.query(
         Project).filter_by(ProjectID=project_id).one()
+    if deletedProject.UserID != login_session['user_id']:
+        output = ""
+        output += "<script>function myFunction() {alert('You are not authorized to "
+        output += "delete this Project. Please access one of the projects you "
+        output += "created or create a new project in order to delete.');}"
+        output += "</script><body onload='myFunction()''>"
+        return output
     if request.method == 'POST':
         projectPictures = session.query(
             UploadFile).filter_by(ProjectID=project_id).all()
@@ -481,4 +567,4 @@ def categoriesJSON():
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)

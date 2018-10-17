@@ -33,6 +33,8 @@ class Category(Base):
     CategoryName = Column(String(75), nullable=False)
     CategoryDesc = Column(String(250))
     CategoryPicture = Column(String(250))
+    UserID = Column(Integer, ForeignKey('User.UserID'))
+    User = relationship(User)
 
     @property
     def serialize(self):
@@ -41,6 +43,7 @@ class Category(Base):
             'CategoryID': self.CategoryID,
             'CategoryName': self.CategoryName,
             'CategoryDesc': self.CategoryDesc,
+            'UserID': self.UserID,
         }
 
 

@@ -17,14 +17,17 @@ session = DBSession()
 # INSERT USERS
 # ******************************************************************************
 # First User - Ben Peach
-user1 = User(Username="Ben Peach",
-             UserEmail="benjamin.j.peach@gmail.com")
+user1 = User(Username="Bob Ross",
+             UserEmail="bross@fake.com",
+             UserPicture="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100&ssl=1")
 
 session.add(user1)
 session.commit()
 
 # Second User - John Doe
-user2 = User(Username="John Doe", UserEmail="john.doe@fake.com")
+user2 = User(Username="John Doe",
+             UserEmail="john.doe@fake.com",
+             UserPicture="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100&ssl=1")
 
 session.add(user2)
 session.commit()
@@ -35,7 +38,7 @@ session.commit()
 # Projects for Woodturning******************************************************
 category1 = Category(CategoryName="Woodturning",
                      CategoryDesc="Turning various wooden items on the lathe!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_woodturning.jpg", User=user1)
 
 session.add(category1)
 session.commit()
@@ -50,7 +53,7 @@ session.commit()
 # Projects for CNC**************************************************************
 category2 = Category(CategoryName="CNC",
                      CategoryDesc="Projects designed and executed using a CNC router or laser!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_CNC.jpg", User=user1)
 
 session.add(category2)
 session.commit()
@@ -70,9 +73,9 @@ session.add(project3)
 session.commit()
 
 # Projects for Home Improvement*************************************************
-category3 = Category(CategoryName="Home Improvement",
+category3 = Category(CategoryName="Furniture",
                      CategoryDesc="Woodworking around the house!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_Furniture.jpg", User=user1)
 
 session.add(category3)
 session.commit()
@@ -94,7 +97,7 @@ session.commit()
 # Projects for Drinkware********************************************************
 category4 = Category(CategoryName="Drinkware",
                      CategoryDesc="Projects designed to enhance your favorite beverage!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_Drinkware.jpg", User=user1)
 
 session.add(category4)
 session.commit()
@@ -130,7 +133,7 @@ session.commit()
 # Projects for Kitchen**********************************************************
 category5 = Category(CategoryName="Kitchen",
                      CategoryDesc="Wooden projects for the kitchen!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_Kitchen.jpg", User=user1)
 
 session.add(category5)
 session.commit()
@@ -157,9 +160,9 @@ session.add(project12)
 session.commit()
 
 # Projects for Outdoors*********************************************************
-category6 = Category(CategoryName="Outdoors",
+category6 = Category(CategoryName="Outdoor",
                      CategoryDesc="Projects intended for outdoor use!",
-                     CategoryPicture="default.jpg")
+                     CategoryPicture="cat_Outdoors.jpg", User=user1)
 
 session.add(category6)
 session.commit()
