@@ -105,6 +105,7 @@ def gconnect():
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
+    login_session['provider'] = 'google'
 
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -128,7 +129,76 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
+    flash("you are now logged in as %s" % login_session['username'])
+    print "done!"
+    return output
+
+
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps(
+            'Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+
+    # Exchange client token for long-lived server-side token with GET /oauth/access_token
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_id']
+    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+    # Use tokent to get user info from API
+    userinfo_url = "https://graph.facebook.com/v2.8/me"
+    # Strip expire tag from access token
+    token = result.split(",")[0]
+    token = token.split(":")[1]
+    token = token.replace('"', '')
+    print "Access Token: %s" % access_token
+    print "Stripped Token: %s" % token
+
+    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    print "url sent for API access:%s" % url
+    print "API JSON result: %s" % result
+    data = json.loads(result)
+
+    login_session['username'] = data['name']
+    login_session['email'] = data['email']
+    login_session['facebook_id'] = data['id']
+    login_session['provider'] = 'facebook'
+    # login_session['picture'] = data['data']['url']
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=picture' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    print "Picture Data: %s" % data
+
+    login_session['picture'] = data['picture']['data']['url']
+
+    # See if user exists
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -137,8 +207,12 @@ def gconnect():
 def createUser(login_session):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    newUser = User(Username=login_session['username'],
-                   UserEmail=login_session['email'], UserPicture=login_session['picture'])
+    if login_session['picture'] == None or login_session['picture'] == "":
+        newUser = User(Username=login_session['username'], UserEmail=login_session['email'],
+                       UserPicture="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100&ssl=1")
+    else:
+        newUser = User(
+            Username=login_session['username'], UserEmail=login_session['email'], UserPicture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(
@@ -206,6 +280,44 @@ def gdisconnect():
             'Failed to revoke token for given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
+
+
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    print "Facebook ID: %s" % login_session['facebook_id']
+    facebook_id = login_session['facebook_id']
+    url = 'https://graph.facebook.com/%s/permissions' % facebook_id
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    del login_session['user_id']
+    del login_session['facebook_id']
+    return "You have been logged out."
+
+
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            # del login_session['gplus_id']
+            # del login_session['credentials']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            # del login_session['facebook_id']
+
+        # del login_session['username']
+        # del login_session['email']
+        # del login_session['picture']
+        # del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+        return redirect(url_for('showCategories'))
+    else:
+        flash("You are not currently logged in.")
+        return redirect(url_for('showCategories'))
 
 
 # ******************************************************************************
