@@ -10,8 +10,7 @@ This application runs on a Vagrant Virtual Machine. If you do not have Vagrant i
 You will need to install the following libraries to run this web application:
  - Flask (```$pip install flask```)
  - SQLAlchemy (```$pip install SQLAlchemy```)
- - SQLAlchemy - ImageAttach (```$pip install SQLAlchemy-ImageAttach```)
-
+ 
 # Running the Woodworking Project Forum App
 Once you have logged your terminal into the virtual machine (```$vagrant ssh```), change to the /vagrant/catalog directory by typing (```$cd /vagrant/catalog```). Type (```$ls```) to ensure that you are inside the directory that contains project.py, database_setup.py, and two directories named 'templates' and 'static'
 
