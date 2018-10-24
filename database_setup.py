@@ -82,6 +82,7 @@ class UploadFile(Base):
     FileID = Column(Integer, primary_key=True)
     FileName = Column(String(300))
     ProjectID = Column(Integer, ForeignKey('Project.ProjectID'))
+    Project = relationship(Project)
 
 
 engine = create_engine('sqlite:///woodworking_projects.db')
