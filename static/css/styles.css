@@ -33,6 +33,16 @@ h4 {
 	color: #4A4A4A;
 	line-height: 23px;
 }
+h5 {
+	font-size: 22px;
+	color: #4A4A4A;
+	line-height: 24px;
+}
+h6 {
+	font-size: 13px;
+	color: #4A4A4A;
+	line-height: 15px;
+}
  p {
  	font-family: "Helvetica Neue", Roboto, Helvetica, Arial, sans-serif;
  	font-size: 16px;
@@ -41,11 +51,11 @@ h4 {
  	font-weight: 400;
  }
 
- strong {
+ /* strong {
  	font-size: 16px;
  	color: #000000;
  	line-height: 24px;
- }
+ } */
 
  a {
  	font-size: 14px;
@@ -151,6 +161,14 @@ u }
  .category-list:hover {
  	background-color: #efd6b3;
  	padding: 20px;
+}
+.category-recentlist {
+  background-color: #F0F0F0;
+ 	padding: 10px;
+u }
+ .category-recentlist:hover {
+ 	background-color: #efd6b3;
+ 	padding: 10px;
 }
 .menu-item {
 	background: #F0F0F0;

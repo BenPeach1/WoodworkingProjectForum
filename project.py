@@ -331,7 +331,7 @@ def showCategories():
     session = DBSession()
     categories = session.query(Category).all()
     recentProjects = session.query(Project).outerjoin(
-        Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(5)
+        Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(6)
     if 'username' not in login_session:
         return render_template('publiccategories.html', categories=categories, recentProjects=recentProjects)
     else:

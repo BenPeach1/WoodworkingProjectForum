@@ -41,9 +41,9 @@
         <a href = "{{url_for('showProjects', category_id = category.CategoryID)}}">
 
               <div class="col-lg-4 col-md-6 col-sm-12 category-list">
-                <img src="{{url_for('static', filename = 'images/' + category.CategoryPicture)}}" style = "width: 350px; height: 350px;border-radius: 15px;-webkit-border-radius: 15px;-moz-border-radius: 15px;">
+                <img src="{{url_for('static', filename = 'images/' + category.CategoryPicture)}}" style = "width: 325px; height: 325px;border-radius: 15px;-webkit-border-radius: 15px;-moz-border-radius: 15px;">
                 </br>
-                <h4>{{category.CategoryName}}</h4>
+                <h5><strong>{{category.CategoryName}}</strong></h5>
               </div>
         </a>
       {% endfor %}
@@ -55,19 +55,20 @@
     <div class="row">
       {% for project in recentProjects %}
           <a href = "{{url_for('showOneProject', category_id = project.CategoryID, project_id=project.ProjectID)}}">
-            <div class="col-lg-4 col-md-6 col-sm-12 category-list">
-              <img src="{{url_for('static', filename = 'images/' + project.ProjectPicture)}}" height="150px" width = "150px">
-              </br>
-              <h4>{{project.ProjectName}}</h4>
-              <h4><strong>Category:</strong> {{project.Category.CategoryName}}</h4>
-              <h4><strong>User:</strong>{{project.User.Username}}</h4>
-              <h4>{{project.DateAdd}}</h4>
+            <div class="col-lg-6 col-md-6 col-sm-6 category-recentlist">
+              <div class="col-lg-2 col-md-2 col-sm-2">
+                <img src="{{url_for('static', filename = 'images/' + project.ProjectPicture)}}" style = "width: 75px; height: 75px;border-radius: 10px;-webkit-border-radius: 10px;-moz-border-radius: 10px;">
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-6">
+                <h5><strong>{{project.ProjectName}}</strong>
+                  <h6><strong>Added: </strong><i>{{project.DateAdd}}</i></h6>
+                </h5>
+              </div>
             </div>
           <a/>
       {% endfor %}
     </div>
   </div>
-
 
 {% include "footer.html" %}
 {% endblock %}
