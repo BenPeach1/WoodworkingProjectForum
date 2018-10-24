@@ -43,7 +43,8 @@ class Category(Base):
             'CategoryID': self.CategoryID,
             'CategoryName': self.CategoryName,
             'CategoryDesc': self.CategoryDesc,
-            'UserID': self.UserID,
+            'Creator': self.User.Username,
+            'CategoryPicture': self.CategoryPicture,
         }
 
 
@@ -72,7 +73,10 @@ class Project(Base):
             'DateAdd': self.DateAdd,
             'DateEdit': self.DateEdit,
             'CategoryID': self.CategoryID,
-            'UserID': self.UserID,
+            'ProjectLocation': self.ProjectLocation,
+            'ProjectPicture': self.ProjectPicture,
+            'Contributor': self.User.Username,
+            'ContibutorPicture': self.User.UserPicture,
         }
 
 
