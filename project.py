@@ -367,7 +367,7 @@ def newCategory():
                 CategoryPicture='default.jpg')
         session.add(newCategory)
         session.commit()
-        # flash("New Category Created!")
+        flash("New Category Created!")
         return redirect(url_for('showCategories'))
     else:
         return render_template('newcategory.html')
@@ -408,7 +408,7 @@ def editCategory(category_id):
                     editedCategory.CategoryPicture = 'default.jpg'
         session.add(editedCategory)
         session.commit()
-        # flash("Category Successfully Edited!")
+        flash("Category Successfully Edited!")
         return redirect(url_for('showCategories'))
     else:
         return render_template('editcategory.html', category_id=category_id, category=editedCategory)
@@ -573,14 +573,6 @@ def editProject(category_id, project_id):
                     editedProject.ProjectPicture = 'default.jpg'
 
             if request.files.get("additional-pictures") != None:
-                # additionalPictures = session.query(
-                #     UploadFile).filter_by(ProjectID=project_id).all()
-                # for picture in additionalPictures:
-                #     deletedPicture = session.query(
-                #         UploadFile).filter_by(FileID=picture.FileID).one()
-                #     session.delete(deletedPicture)
-                #     session.commit()
-
                 for file2 in request.files.getlist("additional-pictures"):
                     filename2 = file2.filename
                     additionalPicture = session.query(UploadFile).filter_by(
@@ -595,7 +587,7 @@ def editProject(category_id, project_id):
                         session.commit()
         session.add(editedProject)
         session.commit()
-        # flash("Project Successfully Edited!")
+        flash("Project Successfully Edited!")
         return redirect(url_for('showOneProject', category_id=category_id, project_id=project_id))
     else:
         return render_template('editproject.html', category_id=category_id, project_id=project_id, project=editedProject)

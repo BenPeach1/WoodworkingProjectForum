@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-	<div class="row divider green">
+	<div class="row divider orange">
 		<div class="col-md-12"></div>
 	</div>
 	<div class="row banner main">
@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <!-- <div class = 'flash'>
+  <div class = 'flash'>
   		      {% with messages = get_flashed_messages() %}
         {% if messages %}
 
@@ -23,9 +23,8 @@
           {% endif %}
       {% endwith %}
 
-  </div> -->
+  </div>
   	<div class="row padding-top padding-bottom">
-  		<!-- <div class="col-md-1"></div> -->
   		<div class="col-md-11 padding-none">
         <a href = '{{url_for('showProjects', category_id=category.CategoryID)}}'>
           <button class="btn btn-default">
@@ -45,12 +44,11 @@
   		<div class="col-md-7"></div>
   	</div>
 
-		<div class="container">
-	    <!-- <h2>{{project.ProjectName}}</h2> -->
+		<div>
 	    <div class="row">
         <div class="col-lg-11 col-md-11 col-sm-11 project-panel">
           <div class="col-lg-5 col-md-5 col-sm-5">
-            <img src='{{url_for('static', filename = 'images/' + project.ProjectPicture)}}' width = "500px" height = "500px">
+            <img src="{{url_for('static', filename = 'images/' + project.ProjectPicture)}}" width = "500px" height = "500px">
           </div>
           <div class="col-lg-1 col-md-1 col-sm-1"></div>
           <div class="col-lg-5 col-md-5 col-sm-5">
@@ -69,11 +67,9 @@
             <div class="row">
 							<div class="thumbnails group">
 	      	      {% for photo in photos %}
-	      	        <!-- <div class="col-lg-2 col-md-2 col-sm-2 thumbnails group"> -->
-
-	                  <a href="{{url_for('static', filename = 'images/' + photo.FileName)}}" data-lightbox="gallery" data-title="{{project.ProjectName}}">
-	                    <img src='{{url_for('static', filename = 'images/' + photo.FileName)}}' width = "75px" height = "75px">
-	                  </a>
+	      	        <a href="{{url_for('static', filename = 'images/' + photo.FileName)}}" data-lightbox="gallery" data-title="{{project.ProjectName}}">
+	                  <img src='{{url_for('static', filename = 'images/' + photo.FileName)}}' width = "75px" height = "75px">
+	                </a>
 	      	      {% endfor %}
 							</div>
       	    </div>
@@ -81,5 +77,6 @@
         </div>
 	    </div>
 	  </div>
+
 {% include "footer.html" %}
 {% endblock %}

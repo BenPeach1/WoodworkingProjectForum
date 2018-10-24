@@ -1,16 +1,16 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-	<div class="row divider green">
+	<div class="row divider orange">
 		<div class="col-md-12"></div>
 	</div>
-	<div class="row banner menu">
+	<div class="row banner project">
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>Edit Project: {{project.ProjectName}}</h1>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-6 col-md-offset-1 padding-top">
+		<div class="col-md-6 padding-top">
 			<form action="{{ url_for('editProject',category_id=category_id, project_id=project_id)}}" method = "POST" enctype="multipart/form-data">
 				<div class="form-group">
 					<label for="name">Project Name:</label>
@@ -38,5 +38,6 @@
         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
 		</div>
 	</div>
+
 {% include "footer.html" %}
 {% endblock %}

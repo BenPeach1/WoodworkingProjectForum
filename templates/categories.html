@@ -1,12 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-  <div class="row top-menu">
-    <div class="col-md-10"></div>
-    <div class="col-md-2 text-right">
-          </div>
-  </div>
-  <div class="row divider blue">
+  <div class="row divider orange">
     <div class="col-md-12"></div>
   </div>
   <div class="row banner main">
@@ -17,9 +12,8 @@
   </div>
 
   <div class = 'flash'>
-		      {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages() %}
       {% if messages %}
-
         <ul>
         {% for message in messages %}
             <li> <strong> {{ message }} </strong> </li>
@@ -27,13 +21,9 @@
         </ul>
         {% endif %}
     {% endwith %}
-
-  </div>
-  <div>
   </div>
 
   <div class="row padding-top padding-bottom">
-		<div class="col-md-1"></div>
 		<div class="col-md-10 padding-none">
 			<a href="{{url_for('newCategory')}}">
 				<button class="btn btn-default" id="new-restaurant">
@@ -44,35 +34,34 @@
 		<div class="col-md-1"></div>
 	</div>
 
-  <div class="container">
+  <div>
     <h2>Project Categories</h2>
     <div class="row">
       {% for category in categories %}
         <a href = "{{url_for('showProjects', category_id = category.CategoryID)}}">
 
               <div class="col-lg-4 col-md-6 col-sm-12 category-list">
-                <img src='{{url_for('static', filename = 'images/' + category.CategoryPicture)}}' class="img-fluid">
+                <img src="{{url_for('static', filename = 'images/' + category.CategoryPicture)}}" style = "width: 350px; height: 350px;border-radius: 15px;-webkit-border-radius: 15px;-moz-border-radius: 15px;">
                 </br>
-                <h3>{{category.CategoryName}}</h3>
+                <h4>{{category.CategoryName}}</h4>
               </div>
         </a>
       {% endfor %}
     </div>
   </div>
 
-  <div class="container">
+  <div>
     <h2>Recent Projects</h2>
     <div class="row">
       {% for project in recentProjects %}
           <a href = "{{url_for('showOneProject', category_id = project.CategoryID, project_id=project.ProjectID)}}">
-          <!-- <div class="col-lg-4 col-md-6 col-sm-12 category-list"> -->
             <div class="col-lg-4 col-md-6 col-sm-12 category-list">
-              <img src='{{url_for('static', filename = 'images/' + project.ProjectPicture)}}' height="150px" width = "150px">
+              <img src="{{url_for('static', filename = 'images/' + project.ProjectPicture)}}" height="150px" width = "150px">
               </br>
-              <h3>{{project.ProjectName}}</h3>
-              <h3><strong>Category:</strong> {{project.Category.CategoryName}}</h3>
-              <h3><strong>User:</strong>{{project.User.Username}}</h3>
-              <h3>{{project.DateAdd}}</h3>
+              <h4>{{project.ProjectName}}</h4>
+              <h4><strong>Category:</strong> {{project.Category.CategoryName}}</h4>
+              <h4><strong>User:</strong>{{project.User.Username}}</h4>
+              <h4>{{project.DateAdd}}</h4>
             </div>
           <a/>
       {% endfor %}
@@ -80,4 +69,5 @@
   </div>
 
 
+{% include "footer.html" %}
 {% endblock %}
