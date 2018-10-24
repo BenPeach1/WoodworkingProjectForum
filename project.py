@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 
 
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, func
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, UploadFile, User, Category, Project
 
@@ -332,6 +332,8 @@ def showCategories():
     categories = session.query(Category).all()
     recentProjects = session.query(Project).outerjoin(
         Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(6)
+    # recentProjects = session.query(Project.ProjectName, func.to_char(Project.DateAdd, '%Y-%m-%d %H:%M')).order_by(
+    #     Project.DateAdd.desc()).limit(6)
     if 'username' not in login_session:
         return render_template('publiccategories.html', categories=categories, recentProjects=recentProjects)
     else:
@@ -506,13 +508,13 @@ def newProject(category_id):
             file.save(destination)
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
-                CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
+                CategoryID=category_id, DateAdd=datetime.now().replace(microsecond=0), DateEdit=datetime.now().replace(microsecond=0),
                 ProjectLocation=request.form['location'], ProjectPicture=filename,
                 UserID=login_session['user_id'])
         else:
             newProject = Project(
                 ProjectName=request.form['name'], ProjectDesc=request.form['description'],
-                CategoryID=category_id, DateAdd=datetime.now(), DateEdit=datetime.now(),
+                CategoryID=category_id, DateAdd=datetime.now().replace(microsecond=0), DateEdit=datetime.now().replace(microsecond=0),
                 ProjectLocation=request.form['location'], ProjectPicture='default.jpg',
                 UserID=login_session['user_id'])
         session.add(newProject)
@@ -558,7 +560,7 @@ def editProject(category_id, project_id):
             editedProject.ProjectName = request.form['name']
             editedProject.ProjectDesc = request.form['description']
             editedProject.ProjectLocation = request.form['location']
-            editedProject.DateEdit = datetime.now()
+            editedProject.DateEdit = datetime.now().replace(microsecond=0)
             target = os.path.join(APP_ROOT, 'static/images/')
             if not os.path.isdir(target):
                 os.mkdir(target)
