@@ -89,17 +89,19 @@ h6 {
 	margin: 0;
 	border-color: #ff8c00;
 	border-width: 2px;
-	color: #ff8c00;;
+	color: #ff8c00;
 }
 .btn:hover {
-	border-color: #ff8c00;
+	border-color: #000000;
+	background-color: #ff8c00;
+	color: #000000;
 }
 .btn.delete {
 	border-color: #aaaaaa;
-	color: #aaaaaa;
+	color: red;
 }
 .btn.delete:hover {
-	border-color: #aaaaaa;
+	border-color: #000000;
 	color: red;
 }
 .glyphicon {
