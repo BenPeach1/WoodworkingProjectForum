@@ -1,5 +1,11 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   jsonify,
+                   url_for,
+                   flash,
+                   make_response)
 
 from sqlalchemy import create_engine, asc, func
 from sqlalchemy.orm import sessionmaker
@@ -16,7 +22,6 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
-from flask import make_response
 import requests
 
 app = Flask(__name__)
@@ -97,7 +102,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Current user already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -129,7 +134,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
+    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;'
+    output += '-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
     flash("You are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -144,12 +150,14 @@ def fbconnect():
         return response
     access_token = request.data
 
-    # Exchange client token for long-lived server-side token with GET /oauth/access_token
+    # Exchange client token for long-lived server-side token
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_id']
     app_secret = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_'
+    url += 'exchange_token&'
+    url += 'client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
         app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -163,7 +171,8 @@ def fbconnect():
     print "Access Token: %s" % access_token
     print "Stripped Token: %s" % token
 
-    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v2.8/me?'
+    url += 'access_token=%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     print "url sent for API access:%s" % url
@@ -177,7 +186,8 @@ def fbconnect():
     # login_session['picture'] = data['data']['url']
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=picture' % token
+    url = 'https://graph.facebook.com/v2.8/me?'
+    url += 'access_token=%s&fields=picture' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -198,7 +208,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
+    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;'
+    output += '-webkit-border-radius: 25px;-moz-border-radius: 25px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -207,12 +218,18 @@ def fbconnect():
 def createUser(login_session):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    if login_session['picture'] == None or login_session['picture'] == "":
-        newUser = User(Username=login_session['username'], UserEmail=login_session['email'],
-                       UserPicture="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100&ssl=1")
+    if login_session['picture'] is None or login_session['picture'] == "":
+        defaultImage = "https://i1.wp.com/www.winhelponline.com/blog/"
+        defaultImage += "wp-content/uploads/2017/12/user.png?"
+        defaultImage += "fit=256%2C256&quality=100&ssl=1"
+        newUser = User(Username=login_session['username'],
+                       UserEmail=login_session['email'],
+                       UserPicture=defaultImage)
     else:
         newUser = User(
-            Username=login_session['username'], UserEmail=login_session['email'], UserPicture=login_session['picture'])
+            Username=login_session['username'],
+            UserEmail=login_session['email'],
+            UserPicture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(
@@ -227,7 +244,7 @@ def getUserID(checkEmail):
         checkUser = session.query(User).filter_by(
             UserEmail=checkEmail).one()
         return checkUser.UserID
-    except:
+    except Exception:
         return None
 
 
@@ -237,7 +254,7 @@ def getUserInfo(user_id):
     try:
         userInfo = session.query(User).filter_by(UserID=user_id).one()
         return userInfo
-    except:
+    except Exception:
         return None
 
 
@@ -302,16 +319,9 @@ def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
-            # del login_session['gplus_id']
-            # del login_session['credentials']
         if login_session['provider'] == 'facebook':
             fbdisconnect()
-            # del login_session['facebook_id']
 
-        # del login_session['username']
-        # del login_session['email']
-        # del login_session['picture']
-        # del login_session['user_id']
         del login_session['provider']
         flash("You have successfully been logged out.")
         return redirect(url_for('showCategories'))
@@ -320,9 +330,9 @@ def disconnect():
         return redirect(url_for('showCategories'))
 
 
-# ******************************************************************************
+# **************************************************************************
 # SHOW CATEGORIES:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/')
 @app.route('/category')
 def showCategories():
@@ -332,17 +342,17 @@ def showCategories():
     categories = session.query(Category).all()
     recentProjects = session.query(Project).outerjoin(
         Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(6)
-    # recentProjects = session.query(Project.ProjectName, func.to_char(Project.DateAdd, '%Y-%m-%d %H:%M')).order_by(
-    #     Project.DateAdd.desc()).limit(6)
     if 'username' not in login_session:
-        return render_template('publiccategories.html', categories=categories, recentProjects=recentProjects)
+        return render_template('publiccategories.html', categories=categories,
+                               recentProjects=recentProjects)
     else:
-        return render_template('categories.html', categories=categories, recentProjects=recentProjects)
+        return render_template('categories.html', categories=categories,
+                               recentProjects=recentProjects)
 
 
-# ******************************************************************************
+# **************************************************************************
 # ADD CATEGORY:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/new', methods=['GET', 'POST'])
 def newCategory():
     DBSession = sessionmaker(bind=engine)
@@ -353,7 +363,7 @@ def newCategory():
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
-        if request.files.get("picture") != None:
+        if request.files.get("picture") is not None:
             file = request.files.get("picture")
             filename = file.filename
             destination = "/".join([target, filename])
@@ -366,7 +376,8 @@ def newCategory():
         else:
             newCategory = Category(
                 CategoryName=request.form['name'],
-                CategoryPicture='default.jpg')
+                CategoryPicture='default.jpg',
+                UserID=login_session['user_id'])
         session.add(newCategory)
         session.commit()
         flash("New Category Created!")
@@ -375,9 +386,9 @@ def newCategory():
         return render_template('newcategory.html')
 
 
-# ******************************************************************************
+# **************************************************************************
 # EDIT CATEGORY:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
     if 'username' not in login_session:
@@ -388,9 +399,10 @@ def editCategory(category_id):
         Category).filter_by(CategoryID=category_id).one()
     if editedCategory.UserID != login_session['user_id']:
         output = ""
-        output += "<script>function myFunction() {alert('You are not authorized to "
-        output += "edit this category. Please access one of the categories you "
-        output += "created or create a new category in order to edit.');}"
+        output += "<script>function myFunction() {alert('You are not "
+        output += "authorized to edit this category. Please access one of "
+        output += "the categories you created or create a new category "
+        output += "in order to edit.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
     if request.method == 'POST':
@@ -399,26 +411,27 @@ def editCategory(category_id):
             target = os.path.join(APP_ROOT, 'static/images/')
             # if not os.path.isdir(target):
             #     os.mkdir(target)
-            if request.files.get("picture") != None:
+            if request.files.get("picture") is not None:
                 file = request.files.get("picture")
                 filename = file.filename
                 destination = "/".join([target, filename])
                 file.save(destination)
                 editedCategory.CategoryPicture = filename
             else:
-                if editedCategory.CategoryPicture == None:
+                if editedCategory.CategoryPicture is None:
                     editedCategory.CategoryPicture = 'default.jpg'
         session.add(editedCategory)
         session.commit()
         flash("Category Successfully Edited!")
         return redirect(url_for('showCategories'))
     else:
-        return render_template('editcategory.html', category_id=category_id, category=editedCategory)
+        return render_template('editcategory.html', category_id=category_id,
+                               category=editedCategory)
 
 
-# ******************************************************************************
+# **************************************************************************
 # DELETE CATEGORY:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     if 'username' not in login_session:
@@ -429,9 +442,10 @@ def deleteCategory(category_id):
         Category).filter_by(CategoryID=category_id).one()
     if deletedCategory.UserID != login_session['user_id']:
         output = ""
-        output += "<script>function myFunction() {alert('You are not authorized to "
-        output += "delete this category. Please access one of the categories you "
-        output += "created or create a new category in order to delete.');}"
+        output += "<script>function myFunction() {alert('You are not "
+        output += "authorized to delete this category. Please access one of "
+        output += "the categories you created or create a new category in "
+        output += "order to delete.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
     if request.method == 'POST':
@@ -443,9 +457,9 @@ def deleteCategory(category_id):
         return render_template('deletecategory.html', category=deletedCategory)
 
 
-# ******************************************************************************
+# **************************************************************************
 # SHOW PROJECTS:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/')
 @app.route('/category/<int:category_id>/projects')
 def showProjects(category_id):
@@ -457,17 +471,20 @@ def showProjects(category_id):
     projects = session.query(Project).filter_by(
         CategoryID=category.CategoryID)
     if 'username' not in login_session:
-        return render_template('publicprojects.html', category=category, projects=projects)
+        return render_template('publicprojects.html', category=category,
+                               projects=projects)
     else:
-        if contributor.UserID != login_session['user_id']:
-            return render_template('publicprojects.html', category=category, projects=projects)
+        if contributor and contributor.UserID != login_session['user_id']:
+            return render_template('publicprojects.html', category=category,
+                                   projects=projects)
         else:
-            return render_template('projects.html', category=category, projects=projects, contributor=contributor)
+            return render_template('projects.html', category=category,
+                                   projects=projects, contributor=contributor)
 
 
-# ******************************************************************************
+# **************************************************************************
 # SHOW ONE PROJECT:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/projects/<int:project_id>')
 def showOneProject(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
@@ -480,47 +497,63 @@ def showOneProject(category_id, project_id):
         ProjectID=project_id).all()
     contributor = getUserInfo(project.UserID)
     if 'username' not in login_session:
-        return render_template('publiconeproject.html', category=category, project=project, photos=photos, contributor=contributor)
+        return render_template('publiconeproject.html', category=category,
+                               project=project, photos=photos,
+                               contributor=contributor)
     else:
         if login_session['user_id'] == project.UserID:
-            return render_template('oneproject.html', category=category, project=project, photos=photos, contributor=contributor)
+            return render_template('oneproject.html', category=category,
+                                   project=project, photos=photos,
+                                   contributor=contributor)
         else:
-            return render_template('publiconeproject.html', category=category, project=project, photos=photos, contributor=contributor)
+            return render_template('publiconeproject.html', category=category,
+                                   project=project, photos=photos,
+                                   contributor=contributor)
 
 
-# ******************************************************************************
+# **************************************************************************
 # ADD PROJECT:
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/projects/new', methods=['GET', 'POST'])
 def newProject(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
+    category = session.query(Category).filter_by(
+        CategoryID=category_id).one()
     if request.method == 'POST':
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
-        if request.files.get("picture") != None:
+        if request.files.get("picture") is not None:
             file = request.files.get("picture")
             filename = file.filename
             destination = "/".join([target, filename])
             file.save(destination)
             newProject = Project(
-                ProjectName=request.form['name'], ProjectDesc=request.form['description'],
-                CategoryID=category_id, DateAdd=datetime.now().replace(microsecond=0), DateEdit=datetime.now().replace(microsecond=0),
-                ProjectLocation=request.form['location'], ProjectPicture=filename,
+                ProjectName=request.form['name'],
+                ProjectDesc=request.form['description'],
+                CategoryID=category_id,
+                DateAdd=datetime.now().replace(microsecond=0),
+                DateEdit=datetime.now().replace(microsecond=0),
+                ProjectLocation=request.form['location'],
+                ProjectPicture=filename,
                 UserID=login_session['user_id'])
         else:
             newProject = Project(
-                ProjectName=request.form['name'], ProjectDesc=request.form['description'],
-                CategoryID=category_id, DateAdd=datetime.now().replace(microsecond=0), DateEdit=datetime.now().replace(microsecond=0),
-                ProjectLocation=request.form['location'], ProjectPicture='default.jpg',
+                ProjectName=request.form['name'],
+                ProjectDesc=request.form['description'],
+                CategoryID=category_id,
+                DateAdd=datetime.now().replace(microsecond=0),
+                DateEdit=datetime.now().replace(microsecond=0),
+                ProjectLocation=request.form['location'],
+                ProjectPicture='default.jpg',
                 UserID=login_session['user_id'])
         session.add(newProject)
         session.commit()
 
-        if request.files.get("additional-pictures") != None:
+        if request.files.get("additional-pictures") is not None:
             for file2 in request.files.getlist("additional-pictures"):
                 filename2 = file2.filename
                 destination = "/".join([target, filename2])
@@ -532,13 +565,14 @@ def newProject(category_id):
         flash("New Project Created!")
         return redirect(url_for('showProjects', category_id=category_id))
     else:
-        return render_template('newproject.html', category_id=category_id)
+        return render_template('newproject.html', category_id=category_id, category=category)
 
 
-# ******************************************************************************
+# **************************************************************************
 # EDIT PROJECT
-# ******************************************************************************
-@app.route('/category/<int:category_id>/projects/<project_id>/edit', methods=['GET', 'POST'])
+# **************************************************************************
+@app.route('/category/<int:category_id>/projects/<project_id>/edit',
+           methods=['GET', 'POST'])
 def editProject(category_id, project_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -550,9 +584,10 @@ def editProject(category_id, project_id):
         ProjectID=project_id).all()
     if editedProject.UserID != login_session['user_id']:
         output = ""
-        output += "<script>function myFunction() {alert('You are not authorized to "
-        output += "edit this Project. Please access one of the projects you "
-        output += "created or create a new project in order to edit.');}"
+        output += "<script>function myFunction() {alert('You are not "
+        output += "authorized to edit this Project. Please access one of "
+        output += "the projects you created or create a new project "
+        output += "in order to edit.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
     if request.method == 'POST':
@@ -564,22 +599,23 @@ def editProject(category_id, project_id):
             target = os.path.join(APP_ROOT, 'static/images/')
             if not os.path.isdir(target):
                 os.mkdir(target)
-            if request.files.get("picture") != None:
+            if request.files.get("picture") is not None:
                 file = request.files.get("picture")
                 filename = file.filename
                 destination = "/".join([target, filename])
                 file.save(destination)
                 editedProject.ProjectPicture = filename
             else:
-                if editedProject.ProjectPicture == None:
+                if editedProject.ProjectPicture is None:
                     editedProject.ProjectPicture = 'default.jpg'
 
-            if request.files.get("additional-pictures") != None:
+            if request.files.get("additional-pictures") is not None:
                 for file2 in request.files.getlist("additional-pictures"):
                     filename2 = file2.filename
                     additionalPicture = session.query(UploadFile).filter_by(
-                        ProjectID=project_id).filter_by(FileName=filename2).first()
-                    if additionalPicture == None:
+                        ProjectID=project_id).filter_by(
+                        FileName=filename2).first()
+                    if additionalPicture is None:
                         destination = "/".join([target,
                                                 filename2])
                         file2.save(destination)
@@ -590,15 +626,18 @@ def editProject(category_id, project_id):
         session.add(editedProject)
         session.commit()
         flash("Project Successfully Edited!")
-        return redirect(url_for('showOneProject', category_id=category_id, project_id=project_id))
+        return redirect(url_for('showOneProject', category_id=category_id,
+                                project_id=project_id))
     else:
-        return render_template('editproject.html', category_id=category_id, project_id=project_id, project=editedProject)
+        return render_template('editproject.html', category_id=category_id,
+                               project_id=project_id, project=editedProject)
 
 
-# ******************************************************************************
+# **************************************************************************
 # DELETE PROJECT:
-# ******************************************************************************
-@app.route('/category/<int:category_id>/projects/<project_id>/delete', methods=['GET', 'POST'])
+# **************************************************************************
+@app.route('/category/<int:category_id>/projects/<project_id>/delete',
+           methods=['GET', 'POST'])
 def deleteProject(category_id, project_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -608,15 +647,16 @@ def deleteProject(category_id, project_id):
         Project).filter_by(ProjectID=project_id).one()
     if deletedProject.UserID != login_session['user_id']:
         output = ""
-        output += "<script>function myFunction() {alert('You are not authorized to "
-        output += "delete this Project. Please access one of the projects you "
-        output += "created or create a new project in order to delete.');}"
+        output += "<script>function myFunction() {alert('You are not "
+        output += "authorized to delete this Project. Please access one of "
+        output += "the projects you created or create a new project "
+        output += "in order to delete.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
     if request.method == 'POST':
         projectPictures = session.query(
             UploadFile).filter_by(ProjectID=project_id).all()
-        if projectPictures != None:
+        if projectPictures is not None:
             for picture in projectPictures:
                 deletedPicture = session.query(
                     UploadFile).filter_by(FileID=picture.FileID).one()
@@ -629,15 +669,16 @@ def deleteProject(category_id, project_id):
         flash("Project Successfully Deleted!")
         return redirect(url_for('showProjects', category_id=category_id))
     else:
-        return render_template('deleteproject.html', category_id=category_id, project_id=project_id, project=deletedProject)
+        return render_template('deleteproject.html', category_id=category_id,
+                               project_id=project_id, project=deletedProject)
 
 
-# ******************************************************************************
+# **************************************************************************
 # JSON API Endpoints:
-# ******************************************************************************
+# **************************************************************************
 
 # JSON Endpoint to view Category data
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/projects/JSON')
 def categoryProjectsJSON(category_id):
     DBSession = sessionmaker(bind=engine)
@@ -650,7 +691,7 @@ def categoryProjectsJSON(category_id):
 
 
 # JSON Endpoint to view Individual Project data
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/<int:category_id>/projects/<int:project_id>/JSON')
 def projectJSON(category_id, project_id):
     DBSession = sessionmaker(bind=engine)
@@ -661,7 +702,7 @@ def projectJSON(category_id, project_id):
 
 
 # JSON Endpoint to view Category/Project data
-# ******************************************************************************
+# **************************************************************************
 @app.route('/category/JSON')
 def categoriesJSON():
     DBSession = sessionmaker(bind=engine)

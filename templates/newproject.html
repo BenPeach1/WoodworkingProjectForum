@@ -6,7 +6,7 @@
 	</div>
 	<div class="row banner project">
 		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>New Project</h1>
+			<h1>New Project: {{category.CategoryName}}</h1>
 		</div>
 	</div>
 	<div class="row">
@@ -14,7 +14,7 @@
 			<form action="{{ url_for('newProject', category_id=category_id)}}" method = "POST" enctype="multipart/form-data">
 				<div class="form-group">
 					<label for="name">Project Name:</label>
-					<input type ="text" class="form-control" name="name">
+					<input type ="text" class="form-control" name="name" required>
 					<div class="padding-bottom"></div>
           <label for="description">Project Description:</label>
 					<input type ="text" class="form-control" name="description">
