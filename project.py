@@ -370,7 +370,6 @@ def newCategory():
     if 'username' not in login_session:
         # prevent unauthorized users from adding new categories
         return redirect('/login')
-    # if request.method == 'POST':
     if form.validate_on_submit():
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
@@ -419,7 +418,7 @@ def editCategory(category_id):
         output += "in order to edit.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
-    if request.method == 'POST':
+    if form.validate_on_submit():
         if request.form['name']:
             editedCategory.CategoryName = request.form['name']
             target = os.path.join(APP_ROOT, 'static/images/')
@@ -551,7 +550,7 @@ def newProject(category_id):
     category = session.query(Category).filter_by(
         CategoryID=category_id).one()
     form = ProjectForm()
-    if request.method == 'POST':
+    if form.validate_on_submit():
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
@@ -622,7 +621,7 @@ def editProject(category_id, project_id):
         output += "</script><body onload='myFunction()''>"
         return output
     form = ProjectForm()
-    if request.method == 'POST':
+    if form.validate_on_submit():
         if request.form['name']:
             editedProject.ProjectName = request.form['name']
             editedProject.ProjectDesc = request.form['description']
