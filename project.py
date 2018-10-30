@@ -23,8 +23,12 @@ from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 import requests
+from flask_wtf import Form
+from wtforms import StringField, TextField, TextAreaField
+from wtforms.validators import InputRequired
 
 app = Flask(__name__)
+# app.config['SECRET_KEY'] = 'ChangeMeNow!'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -353,13 +357,20 @@ def showCategories():
 # **************************************************************************
 # ADD CATEGORY:
 # **************************************************************************
+class CategoryForm(Form):
+    name = TextField(
+        'name', validators=[InputRequired()], )
+
+
 @app.route('/category/new', methods=['GET', 'POST'])
 def newCategory():
+    form = CategoryForm()
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     if 'username' not in login_session:
         return redirect('/login')
-    if request.method == 'POST':
+    # if request.method == 'POST':
+    if form.validate_on_submit():
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
             os.mkdir(target)
@@ -383,7 +394,7 @@ def newCategory():
         flash("New Category Created!")
         return redirect(url_for('showCategories'))
     else:
-        return render_template('newcategory.html')
+        return render_template('newcategory.html', form=form)
 
 
 # **************************************************************************
@@ -397,6 +408,7 @@ def editCategory(category_id):
     session = DBSession()
     editedCategory = session.query(
         Category).filter_by(CategoryID=category_id).one()
+    form = CategoryForm()
     if editedCategory.UserID != login_session['user_id']:
         output = ""
         output += "<script>function myFunction() {alert('You are not "
@@ -426,7 +438,7 @@ def editCategory(category_id):
         return redirect(url_for('showCategories'))
     else:
         return render_template('editcategory.html', category_id=category_id,
-                               category=editedCategory)
+                               category=editedCategory, form=form)
 
 
 # **************************************************************************
@@ -448,13 +460,15 @@ def deleteCategory(category_id):
         output += "order to delete.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
+    form = CategoryForm()
     if request.method == 'POST':
         session.delete(deletedCategory)
         session.commit()
         flash("Category Successfully Deleted!")
         return redirect(url_for('showCategories'))
     else:
-        return render_template('deletecategory.html', category=deletedCategory)
+        return render_template('deletecategory.html', category=deletedCategory,
+                               form=form)
 
 
 # **************************************************************************
@@ -514,6 +528,13 @@ def showOneProject(category_id, project_id):
 # **************************************************************************
 # ADD PROJECT:
 # **************************************************************************
+class ProjectForm(Form):
+    name = TextField('name', validators=[InputRequired()])
+    description = TextAreaField(
+        'description', validators=[InputRequired()])
+    location = TextField('location', validators=[InputRequired()])
+
+
 @app.route('/category/<int:category_id>/projects/new', methods=['GET', 'POST'])
 def newProject(category_id):
     if 'username' not in login_session:
@@ -522,6 +543,7 @@ def newProject(category_id):
     session = DBSession()
     category = session.query(Category).filter_by(
         CategoryID=category_id).one()
+    form = ProjectForm()
     if request.method == 'POST':
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
@@ -565,7 +587,8 @@ def newProject(category_id):
         flash("New Project Created!")
         return redirect(url_for('showProjects', category_id=category_id))
     else:
-        return render_template('newproject.html', category_id=category_id, category=category)
+        return render_template('newproject.html', category_id=category_id,
+                               category=category, form=form)
 
 
 # **************************************************************************
@@ -590,6 +613,7 @@ def editProject(category_id, project_id):
         output += "in order to edit.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
+    form = ProjectForm()
     if request.method == 'POST':
         if request.form['name']:
             editedProject.ProjectName = request.form['name']
@@ -630,7 +654,8 @@ def editProject(category_id, project_id):
                                 project_id=project_id))
     else:
         return render_template('editproject.html', category_id=category_id,
-                               project_id=project_id, project=editedProject)
+                               project_id=project_id, project=editedProject,
+                               form=form)
 
 
 # **************************************************************************
@@ -653,6 +678,7 @@ def deleteProject(category_id, project_id):
         output += "in order to delete.'); window.location.href = '/';}"
         output += "</script><body onload='myFunction()''>"
         return output
+    form = ProjectForm()
     if request.method == 'POST':
         projectPictures = session.query(
             UploadFile).filter_by(ProjectID=project_id).all()
@@ -670,7 +696,8 @@ def deleteProject(category_id, project_id):
         return redirect(url_for('showProjects', category_id=category_id))
     else:
         return render_template('deleteproject.html', category_id=category_id,
-                               project_id=project_id, project=deletedProject)
+                               project_id=project_id, project=deletedProject,
+                               form=form)
 
 
 # **************************************************************************

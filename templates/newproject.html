@@ -13,14 +13,18 @@
 		<div class="col-md-6 padding-top">
 			<form action="{{ url_for('newProject', category_id=category_id)}}" method = "POST" enctype="multipart/form-data">
 				<div class="form-group">
+					{{ form.csrf_token }}
 					<label for="name">Project Name:</label>
-					<input type ="text" class="form-control" name="name" required>
+					</br>
+					{{ form.name }}
 					<div class="padding-bottom"></div>
           <label for="description">Project Description:</label>
-					<input type ="text" class="form-control" name="description">
+					</br>
+					{{ form.description }}
 					<div class="padding-bottom"></div>
 					<label for="description">Location:</label>
-					<input type ="text" class="form-control" name="location">
+					</br>
+					{{ form.location }}
 					<div class="padding-bottom"></div>
           <label for="picture">Primary Picture:</label>
           <input type="file" name="picture" accept="image/*">

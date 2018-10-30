@@ -13,14 +13,21 @@
 		<div class="col-md-6 padding-top">
 			<form action="{{ url_for('editProject',category_id=category_id, project_id=project_id)}}" method = "POST" enctype="multipart/form-data">
 				<div class="form-group">
+					{{ form.csrf_token }}
 					<label for="name">Project Name:</label>
-					<input type ="text" class="form-control" name="name" value="{{project.ProjectName}}">
+					<!-- <input type ="text" class="form-control" name="name" value="{{project.ProjectName}}"> -->
+					</br>
+					{{ form.name(width="500px", value=project.ProjectName) }}
 					<div class="padding-bottom"></div>
           <label for="description">Project Description:</label>
-					<input type ="text" class="form-control" name="description" value="{{project.ProjectDesc}}">
+					<!-- <input type ="text" class="form-control" name="description" value="{{project.ProjectDesc}}"> -->
+					</br>
+					{{ form.description(placeholder=project.ProjectDesc) }}
 					<div class="padding-bottom"></div>
-					<label for="description">Location:</label>
-					<input type ="text" class="form-control" name="location" value="{{project.ProjectLocation}}">
+					<label for="location">Location:</label>
+					<!-- <input type ="text" class="form-control" name="location" value="{{project.ProjectLocation}}"> -->
+					</br>
+					{{ form.location(value=project.ProjectLocation) }}
 					<div class="padding-bottom"></div>
           <label for="picture">Primary Picture:</label>
           <input type="file" name="picture" accept="image/*">

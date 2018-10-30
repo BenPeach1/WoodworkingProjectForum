@@ -13,8 +13,10 @@
 		<div class="col-md-6 padding-top">
 			<form action="{{ url_for('newCategory')}}" method = "POST" enctype="multipart/form-data">
 				<div class="form-group">
+          {{ form.csrf_token }}
 					<label for="name">Category Name:</label>
-					<input type ="text" class="form-control" name="name">
+					</br>
+					{{ form.name }}
 					<div class="padding-bottom"></div>
           <label for="picture">Category Picture:</label>
           <input type="file" name="picture" accept="image/*">
