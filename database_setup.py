@@ -1,4 +1,9 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, LargeBinary
+from sqlalchemy import (Column,
+                        ForeignKey,
+                        Integer,
+                        String,
+                        DateTime,
+                        LargeBinary)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -37,6 +42,7 @@ class Category(Base):
     CategoryPicture = Column(String(250))
     UserID = Column(Integer, ForeignKey('User.UserID'))
     User = relationship(User)
+    Projects = relationship("Project", cascade="all, delete-orphan")
 
     @property
     def serialize(self):
@@ -65,6 +71,8 @@ class Project(Base):
     Category = relationship(Category)
     UserID = Column(Integer, ForeignKey('User.UserID'))
     User = relationship(User)
+    Pictures = relationship(
+        "UploadFile", cascade="all, delete-orphan")
 
     @property
     def serialize(self):
