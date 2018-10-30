@@ -9,6 +9,7 @@ Base = declarative_base()
 
 
 class User(Base):
+    """Registered user information stored in db"""
     __tablename__ = 'User'
 
     UserID = Column(Integer, primary_key=True)
@@ -27,6 +28,7 @@ class User(Base):
 
 
 class Category(Base):
+    """Category information stored in db"""
     __tablename__ = 'Category'
 
     CategoryID = Column(Integer, primary_key=True)
@@ -49,6 +51,7 @@ class Category(Base):
 
 
 class Project(Base):
+    """Project information stored in db"""
     __tablename__ = 'Project'
 
     ProjectID = Column(Integer, primary_key=True)
@@ -81,6 +84,7 @@ class Project(Base):
 
 
 class UploadFile(Base):
+    """Uploaded Files - specifically project pictures, stored in db"""
     __tablename__ = 'UploadFile'
 
     FileID = Column(Integer, primary_key=True)
