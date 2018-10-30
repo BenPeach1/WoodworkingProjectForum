@@ -26,6 +26,7 @@ import requests
 from flask_wtf import Form
 from wtforms import StringField, TextField, TextAreaField
 from wtforms.validators import InputRequired
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -333,9 +334,22 @@ def disconnect():
         return redirect(url_for('showCategories'))
 
 
+def login_required(f):
+    # protect sensitive site resources - redirect to login page if needed
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please login to access this page!')
+            return redirect('/login')
+    return decorated_function
+
 # **************************************************************************
 # SHOW CATEGORIES: Display all categories
 # **************************************************************************
+
+
 @app.route('/')
 @app.route('/category')
 def showCategories():
@@ -363,13 +377,11 @@ class CategoryForm(Form):
 
 
 @app.route('/category/new', methods=['GET', 'POST'])
+@login_required
 def newCategory():
     form = CategoryForm()
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    if 'username' not in login_session:
-        # prevent unauthorized users from adding new categories
-        return redirect('/login')
     if form.validate_on_submit():
         target = os.path.join(APP_ROOT, 'static/images/')
         if not os.path.isdir(target):
@@ -401,9 +413,8 @@ def newCategory():
 # EDIT CATEGORY: Edit an existing Category
 # **************************************************************************
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
+@login_required
 def editCategory(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     editedCategory = session.query(
@@ -444,10 +455,8 @@ def editCategory(category_id):
 # DELETE CATEGORY: Delete an existing category
 # **************************************************************************
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+@login_required
 def deleteCategory(category_id):
-    if 'username' not in login_session:
-        # prevent unauthorized users from deleting categories
-        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletedCategory = session.query(
@@ -542,9 +551,8 @@ class ProjectForm(Form):
 
 
 @app.route('/category/<int:category_id>/projects/new', methods=['GET', 'POST'])
+@login_required
 def newProject(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     category = session.query(Category).filter_by(
@@ -602,9 +610,8 @@ def newProject(category_id):
 # **************************************************************************
 @app.route('/category/<int:category_id>/projects/<project_id>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editProject(category_id, project_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     editedProject = session.query(Project).filter_by(
@@ -670,9 +677,8 @@ def editProject(category_id, project_id):
 # **************************************************************************
 @app.route('/category/<int:category_id>/projects/<project_id>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteProject(category_id, project_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletedProject = session.query(
