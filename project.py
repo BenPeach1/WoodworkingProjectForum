@@ -28,7 +28,6 @@ from wtforms import StringField, TextField, TextAreaField
 from wtforms.validators import InputRequired
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'ChangeMeNow!'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -335,18 +334,18 @@ def disconnect():
 
 
 # **************************************************************************
-# SHOW CATEGORIES:
+# SHOW CATEGORIES: Display all categories
 # **************************************************************************
 @app.route('/')
 @app.route('/category')
 def showCategories():
-    # return "This page will display all restaurants"
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     categories = session.query(Category).all()
     recentProjects = session.query(Project).outerjoin(
         Category).outerjoin(User).order_by(Project.DateAdd.desc()).limit(6)
     if 'username' not in login_session:
+        # prevent unauthorized users from adding new categories
         return render_template('publiccategories.html', categories=categories,
                                recentProjects=recentProjects)
     else:
@@ -355,9 +354,10 @@ def showCategories():
 
 
 # **************************************************************************
-# ADD CATEGORY:
+# ADD CATEGORY: Add a new category
 # **************************************************************************
 class CategoryForm(Form):
+    # form class for use with WTForms
     name = TextField(
         'name', validators=[InputRequired()], )
 
@@ -368,6 +368,7 @@ def newCategory():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     if 'username' not in login_session:
+        # prevent unauthorized users from adding new categories
         return redirect('/login')
     # if request.method == 'POST':
     if form.validate_on_submit():
@@ -398,7 +399,7 @@ def newCategory():
 
 
 # **************************************************************************
-# EDIT CATEGORY:
+# EDIT CATEGORY: Edit an existing Category
 # **************************************************************************
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
@@ -410,6 +411,7 @@ def editCategory(category_id):
         Category).filter_by(CategoryID=category_id).one()
     form = CategoryForm()
     if editedCategory.UserID != login_session['user_id']:
+        # Prevent a user from directly accessing this page by URI
         output = ""
         output += "<script>function myFunction() {alert('You are not "
         output += "authorized to edit this category. Please access one of "
@@ -421,8 +423,6 @@ def editCategory(category_id):
         if request.form['name']:
             editedCategory.CategoryName = request.form['name']
             target = os.path.join(APP_ROOT, 'static/images/')
-            # if not os.path.isdir(target):
-            #     os.mkdir(target)
             if request.files.get("picture") is not None:
                 file = request.files.get("picture")
                 filename = file.filename
@@ -442,17 +442,19 @@ def editCategory(category_id):
 
 
 # **************************************************************************
-# DELETE CATEGORY:
+# DELETE CATEGORY: Delete an existing category
 # **************************************************************************
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     if 'username' not in login_session:
+        # prevent unauthorized users from deleting categories
         return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletedCategory = session.query(
         Category).filter_by(CategoryID=category_id).one()
     if deletedCategory.UserID != login_session['user_id']:
+        # Prevent a user from directly accessing this page by URI
         output = ""
         output += "<script>function myFunction() {alert('You are not "
         output += "authorized to delete this category. Please access one of "
@@ -485,10 +487,12 @@ def showProjects(category_id):
     projects = session.query(Project).filter_by(
         CategoryID=category.CategoryID)
     if 'username' not in login_session:
+        # prevent unauthorized users from adding new Projects
         return render_template('publicprojects.html', category=category,
                                projects=projects)
     else:
         if contributor and contributor.UserID != login_session['user_id']:
+            # prevent unauthorized user from adding projects/editing category
             return render_template('publicprojects.html', category=category,
                                    projects=projects)
         else:
@@ -511,6 +515,7 @@ def showOneProject(category_id, project_id):
         ProjectID=project_id).all()
     contributor = getUserInfo(project.UserID)
     if 'username' not in login_session:
+        # prevent unauthorized users from editing Project
         return render_template('publiconeproject.html', category=category,
                                project=project, photos=photos,
                                contributor=contributor)
@@ -520,6 +525,7 @@ def showOneProject(category_id, project_id):
                                    project=project, photos=photos,
                                    contributor=contributor)
         else:
+            # prevent unauthorized users from editing Project
             return render_template('publiconeproject.html', category=category,
                                    project=project, photos=photos,
                                    contributor=contributor)
@@ -529,6 +535,7 @@ def showOneProject(category_id, project_id):
 # ADD PROJECT:
 # **************************************************************************
 class ProjectForm(Form):
+    # form class for use with WTForms
     name = TextField('name', validators=[InputRequired()])
     description = TextAreaField(
         'description', validators=[InputRequired()])
@@ -606,6 +613,7 @@ def editProject(category_id, project_id):
     editedPhotos = session.query(UploadFile).filter_by(
         ProjectID=project_id).all()
     if editedProject.UserID != login_session['user_id']:
+        # Prevent a user from directly accessing this page by URI
         output = ""
         output += "<script>function myFunction() {alert('You are not "
         output += "authorized to edit this Project. Please access one of "
@@ -671,6 +679,7 @@ def deleteProject(category_id, project_id):
     deletedProject = session.query(
         Project).filter_by(ProjectID=project_id).one()
     if deletedProject.UserID != login_session['user_id']:
+        # Prevent a user from directly accessing this page by URI
         output = ""
         output += "<script>function myFunction() {alert('You are not "
         output += "authorized to delete this Project. Please access one of "
