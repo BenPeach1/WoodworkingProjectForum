@@ -5,7 +5,9 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import Base, Category, Project, User, UploadFile
 
-engine = create_engine('sqlite:///woodworking_projects.db')
+# engine = create_engine('sqlite:///woodworking_projects.db')
+engine = create_engine(
+    'postgresql://catalog:Udcatalog2018!@localhost/woodworking_projects')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine

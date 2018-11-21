@@ -32,7 +32,9 @@ app = Flask(__name__)
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-engine = create_engine('sqlite:///woodworking_projects.db')
+# engine = create_engine('sqlite:///woodworking_projects.db')
+engine = create_engine(
+    'postgresql://catalog:Udcatalog2018!@localhost/woodworking_projects')
 Base.metadata.bind = engine
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[

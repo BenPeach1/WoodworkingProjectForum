@@ -101,5 +101,7 @@ class UploadFile(Base):
     Project = relationship(Project)
 
 
-engine = create_engine('sqlite:///woodworking_projects.db')
+# engine = create_engine('sqlite:///woodworking_projects.db')
+engine = create_engine(
+    'postgresql://catalog:Udcatalog2018!@localhost/woodworking_projects')
 Base.metadata.create_all(engine)
